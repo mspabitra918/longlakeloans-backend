@@ -38,7 +38,7 @@ app.use(
   cors({
     origin: [
       "https://longlakeloans-admin-fe.vercel.app",
-      "https://longlakeloans.com",
+      "https://longlakeloans.vercel.app",
       "www.longlakeloans.com",
       "longlakeloans.com",
       process.env.FRONTEND_URL || "http://localhost:3000",
