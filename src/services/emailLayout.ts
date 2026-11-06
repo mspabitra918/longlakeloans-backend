@@ -27,7 +27,6 @@ export const CONTACT = {
   address: "626 Wilshire Blvd - 5th Floor, Ste 575, Los Angeles, CA 90017",
   email: "support@longlakeloans.com",
   website: "https://www.longlakeloans.com",
-  tollFree: { display: "(800) 321-2233", href: "tel:+18003212233" },
   local: { display: "(747) 202-5223", href: "tel:+17472025223" },
 } as const;
 
@@ -37,7 +36,6 @@ export const A = `style="color: ${COLOR.ink}; text-decoration: underline; text-u
 export const STRONG = `style="color: ${COLOR.ink}; font-weight: 600;"`;
 
 export const localPhoneLink = `<a href="${CONTACT.local.href}" ${A}>${CONTACT.local.display}</a>`;
-export const tollFreePhoneLink = `<a href="${CONTACT.tollFree.href}" ${A}>${CONTACT.tollFree.display}</a>`;
 export const supportEmailLink = `<a href="mailto:${CONTACT.email}" ${A}>${CONTACT.email}</a>`;
 
 export function escapeHtml(value: string): string {
@@ -189,8 +187,6 @@ export function renderEmailLayout({
                 <a href="mailto:${CONTACT.email}" style="${footerLink}">${CONTACT.email}</a>
               </p>
               <p style="margin: 0 0 6px; color: ${COLOR.body}; font-family: ${FONT}; font-size: 13px; line-height: 1.6;">
-                Toll-Free <a href="${CONTACT.tollFree.href}" style="${footerLink}">${CONTACT.tollFree.display}</a>
-                &nbsp;&middot;&nbsp;
                 Local <a href="${CONTACT.local.href}" style="${footerLink}">${CONTACT.local.display}</a>
               </p>
               <p style="margin: 0 0 6px; color: ${COLOR.muted}; font-family: ${FONT}; font-size: 13px; line-height: 1.6;">${CONTACT.address}</p>

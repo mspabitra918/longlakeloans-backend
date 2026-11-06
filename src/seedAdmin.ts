@@ -3,58 +3,64 @@ import bcrypt from "bcryptjs";
 import { pool } from "./db";
 
 const admins = [
-  {
-    email: "sam@longlakeloans.com",
-    password: "SaH_9jh#kLq-khgvX",
-    name: "Sam",
-    role: "reviewer",
-  },
-  {
-    email: "sophie@longlakeloans.com",
-    password: "SpH_982#kLq_07aX",
-    name: "Sophie",
-    role: "reviewer",
-  },
-  {
-    email: "max@longlakeloans.com",
-    password: "Mx_491$pWr_83zQ",
-    name: "Max",
-    role: "reviewer",
-  },
-  {
-    email: "james@longlakeloans.com",
-    password: "Jms_715#vRt_94kB",
-    name: "James",
-    role: "reviewer",
-  },
-  {
-    email: "jack@longlakeloans.com",
-    password: "Jck_304$mXy_19pL",
-    name: "Jack",
-    role: "reviewer",
-  },
-  {
-    email: "alex@longlakeloans.com",
-    password: "Alx_628#zKt_51wN",
-    name: "Alex",
-    role: "reviewer",
-  },
-  {
-    email: "kevin@longlakeloans.com",
-    password: "Kvn_159$bQr_42sM",
-    name: "Kevin",
-    role: "reviewer",
-  },
-  {
-    email: "angelina@longlakeloans.com",
-    password: "Ang_837#dLp_60vK",
-    name: "Angelina",
-    role: "reviewer",
-  },
+  // {
+  //   email: "sam@longlakeloans.com",
+  //   password: "SaH_9jh#kLq-khgvX",
+  //   name: "Sam",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "sophie@longlakeloans.com",
+  //   password: "SpH_982#kLq_07aX",
+  //   name: "Sophie",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "max@longlakeloans.com",
+  //   password: "Mx_491$pWr_83zQ",
+  //   name: "Max",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "james@longlakeloans.com",
+  //   password: "Jms_715#vRt_94kB",
+  //   name: "James",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "jack@longlakeloans.com",
+  //   password: "Jck_304$mXy_19pL",
+  //   name: "Jack",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "alex@longlakeloans.com",
+  //   password: "Alx_628#zKt_51wN",
+  //   name: "Alex",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "kevin@longlakeloans.com",
+  //   password: "Kvn_159$bQr_42sM",
+  //   name: "Kevin",
+  //   role: "reviewer",
+  // },
+  // {
+  //   email: "angelina@longlakeloans.com",
+  //   password: "Ang_837#dLp_60vK",
+  //   name: "Angelina",
+  //   role: "reviewer",
+  // },
   {
     email: "pabitraghara3@gmail.com",
     password: "admin",
     name: "Pabitra",
+    role: "admin",
+  },
+  {
+    email: "admin@gmail.com",
+    password: "admin!!admin",
+    name: "System Admin",
     role: "admin",
   },
   {
@@ -63,15 +69,15 @@ const admins = [
     name: "Pabitra",
     role: "reviewer",
   },
-  {
-    email: "admin@longlakeloans.com",
-    password: "XhgdjhY_uuye6543",
-    name: "Administrator",
-    role: "admin",
-  },
+  // {
+  //   email: "admin@longlakeloans.com",
+  //   password: "XhgdjhY_uuye6543",
+  //   name: "Administrator",
+  //   role: "admin",
+  // },
   {
     email: "david@longlakeloans.com",
-    password: "Dvd_512$kPz_34wQ",
+    password: "XhgdjhY_uuye6543",
     name: "David",
     role: "admin",
   },

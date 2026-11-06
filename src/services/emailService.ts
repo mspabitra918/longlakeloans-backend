@@ -25,7 +25,6 @@ import {
   renderPanel,
   renderSignOff,
   supportEmailLink,
-  tollFreePhoneLink,
 } from "./emailLayout";
 
 type EmailSender = typeof sendMailerCloudEmail;
@@ -394,7 +393,7 @@ async function sendBankDetailsReceivedEmail(
       <p ${P}>Your banking verification has been submitted.</p>
       <p ${P}>Next, you&apos;ll schedule or complete your brief call with one of our live underwriter specialists.</p>
 
-      ${renderButton(CONTACT.tollFree.href, `Call ${CONTACT.tollFree.display}`)}
+      ${renderButton(CONTACT.local.href, `Call ${CONTACT.local.display}`)}
 
       ${renderDetails([
         ["Application ID", `#${applicationId}`],
@@ -403,7 +402,7 @@ async function sendBankDetailsReceivedEmail(
 
       <p ${P}><a href="${trackUrl}" style="color: ${COLOR.ink}; font-weight: 500; text-decoration: underline; text-underline-offset: 3px;">Track your application &rarr;</a></p>
 
-      <p ${P}>Need help? Email ${supportEmailLink} or call ${tollFreePhoneLink}.</p>
+      <p ${P}>Need help? Email ${supportEmailLink} or call ${localPhoneLink}.</p>
       ${renderSignOff("LongLake Loans Support")}
     `,
   });
