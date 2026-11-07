@@ -25,7 +25,10 @@ interface DripTemplate {
   previewText: string;
   /** Eyebrow label above the title. */
   label: string;
-  /** Colour of the eyebrow marker. */
+  /**
+   * Colour of the eyebrow marker. Escalates with urgency: brand green for the
+   * first friendly reminder → warning → danger → muted once cancelled.
+   */
   tone: string;
   title: string;
   body: string[];
@@ -41,7 +44,7 @@ const FOLLOWUP_6H: DripTemplate = {
   subject: "Reminder: Complete Your Bank Verification",
   previewText: "Please complete bank verification to finish your application.",
   label: "Reminder",
-  tone: COLOR.warning,
+  tone: COLOR.brand,
   title: "Complete your bank verification",
   body: [
     "Your loan application is still waiting for bank verification.",

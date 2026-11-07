@@ -83,7 +83,7 @@ const APPLICATION_SUBMITTED: DripTemplate = {
 const BANK_VERIFICATION_LINK: DripTemplate = {
   subject: "Next Step: Securely Verify Your Bank Account",
   label: "Next step",
-  tone: COLOR.ink,
+  tone: COLOR.brand,
   title: "Securely verify your bank account",
   body: [
     "We received your application a couple of hours ago, but we still need to verify your active bank account before we can approve your funds for deposit.",

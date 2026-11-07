@@ -400,7 +400,7 @@ async function sendBankDetailsReceivedEmail(
         ["Loan Amount", formatCurrency(loanAmount)],
       ])}
 
-      <p ${P}><a href="${trackUrl}" style="color: ${COLOR.ink}; font-weight: 500; text-decoration: underline; text-underline-offset: 3px;">Track your application &rarr;</a></p>
+      <p ${P}><a href="${trackUrl}" style="color: ${COLOR.brand}; font-weight: 600; text-decoration: underline; text-underline-offset: 3px;">Track your application &rarr;</a></p>
 
       <p ${P}>Need help? Email ${supportEmailLink} or call ${localPhoneLink}.</p>
       ${renderSignOff("LongLake Loans Support")}
