@@ -13,6 +13,7 @@ const numeric = z.union([z.number(), z.string()]).nullable().optional();
 export const applicationFormSchema = z.object({
   loan: z.object({
     amount: numeric,
+    loanTerm: numeric,
     purpose: text,
     otherPurpose: text,
   }),
@@ -93,6 +94,7 @@ export function flattenApplicationForm(
 
   return {
     loanAmount: loan.amount,
+    loanTerm: loan.loanTerm,
     loanPurpose: loan.purpose,
     loanPurposeOther: loan.otherPurpose,
 

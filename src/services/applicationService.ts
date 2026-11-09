@@ -658,6 +658,7 @@ export async function runMlaCoveredBorrowerCheck(
 interface ApplicationColumnValues {
   // loan
   loan_amount: number;
+  loan_term: number | null;
   loan_purpose: string;
   loan_purpose_other_detail: string;
 
@@ -748,6 +749,12 @@ function buildApplicationColumnValues(
 
   return {
     loan_amount: toAmount(mergedData.loanAmount),
+    // Null (unanswered / off-list) keeps any stored term on the step-save path
+    // and satisfies the column's CHECK constraint on insert.
+    loan_term: (() => {
+      const term = toWholeNumber(mergedData.loanTerm);
+      return term !== null && LOAN_TERMS.includes(term) ? term : null;
+    })(),
     loan_purpose: clip(mergedData.loanPurpose, 50),
     loan_purpose_other_detail: clip(
       pick(mergedData, "loanPurposeOther", "purposeOtherDetail"),

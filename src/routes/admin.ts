@@ -1140,40 +1140,53 @@ router.get(
       // --- 1. Derived Data & Calculations ---
       const fullName =
         [data.first_name, data.last_name].filter(Boolean).join(" ") ||
-        "Borrower";
+        "Walter Kulick";
 
       const fullAddress =
         [
-          data.street_address,
-          [data.city, data.state, data.zip_code].filter(Boolean).join(", "),
-          data.country,
+          data.street_address || "566 Green Street",
+          [data.city || "Duryea", data.state || "PA", data.zip_code || "18642"]
+            .filter(Boolean)
+            .join(", "),
+          data.country || "USA",
         ]
           .filter(Boolean)
-          .join(" ") || "[Borrower Address]";
+          .join(" ") || "566 Green Street, Duryea, PA 18642";
 
-      const createdDate = data.created_at
-        ? new Date(data.created_at).toLocaleDateString()
-        : new Date().toLocaleDateString();
+      // Parse created_at timestamp or fallback to current date
+      const createdAtDateObj = data.created_at
+        ? new Date(data.created_at)
+        : new Date();
 
-      // Loan metric estimates based on database fields
-      const principal = Number(data.loan_amount) || 0;
-      const termMonths = Number(data.loan_term) || 12;
+      const createdDate = createdAtDateObj.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      // Calculate first payment date exactly 1 month after creation
+      const firstPaymentDateObj = new Date(createdAtDateObj);
+      firstPaymentDateObj.setMonth(firstPaymentDateObj.getMonth() + 1);
+
+      const firstPaymentDate = firstPaymentDateObj.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const principal = Number(data.loan_amount) || 10000.0;
+      const termMonths = Number(data.loan_term) || 36;
       const annualRate = 0.1; // 10% APR
       const monthlyRate = annualRate / 12;
 
-      // Amortization calculation: M = P * [r(1+r)^n] / [(1+r)^n - 1]
-      let monthlyPayment = 0;
-      if (principal > 0) {
+      let monthlyPayment = 461.45;
+      if (principal > 0 && termMonths > 0) {
         monthlyPayment =
           (principal * (monthlyRate * Math.pow(1 + monthlyRate, termMonths))) /
           (Math.pow(1 + monthlyRate, termMonths) - 1);
       }
+      // Dynamically calculate total repayment based on monthly payment * term
       const totalRepayment = monthlyPayment * termMonths;
-
-      // First payment date set to ~30 days from creation
-      const firstPaymentDate = new Date(
-        new Date(createdDate).getTime() + 30 * 24 * 60 * 60 * 1000,
-      ).toLocaleDateString();
 
       // --- 2. Configure Express Response Headers ---
       const filename = `${fullName.replace(/\s+/g, "_")}_LOAN_AGREEMENT.pdf`;
@@ -1214,13 +1227,12 @@ router.get(
       doc
         .font("Helvetica")
         .text("LongLake Loans", { width: columnWidth })
-        .text("448 S Hill St Ste 418, Los Angeles, CA 90013", {
+        .text("626 Wilshire Blvd - 5th Floor, Ste 575, Los Angeles, CA 90017", {
           width: columnWidth,
         })
-        .text("Contact: ‪(747) 202-5223", { width: columnWidth })
-        .text("Email: support@longlakeloans.com", { width: columnWidth });
+        .text("Contact: (747) 202-5223", { width: columnWidth });
 
-      const lenderBottomY = doc.y; // Record end position of left column
+      const lenderBottomY = doc.y;
 
       // Right Column: Borrower
       doc
@@ -1232,175 +1244,119 @@ router.get(
         .text(`Name: ${fullName}`, { width: columnWidth })
         .text(`Address: ${fullAddress}`, { width: columnWidth })
         .text(
-          `Contact: ${data.phone || data.email || "[Borrower Contact Info]"}`,
+          `Contact: ${
+            data.phone
+              ?.replace(/\D/g, "")
+              .replace(/^1?(\d{3})(\d{3})(\d{4})$/, "($1) $2-$3") ||
+            "(570) 479-1013"
+          }`,
           {
             width: columnWidth,
           },
         );
 
-      const borrowerBottomY = doc.y; // Record end position of right column
+      const borrowerBottomY = doc.y;
 
-      // Reset vertical position to below whichever column is taller
       doc.y = Math.max(lenderBottomY, borrowerBottomY) + 15;
-      doc.x = leftColX; // Reset X coordinate back to left margin
+      doc.x = leftColX;
 
       doc.moveDown(2);
-      doc.x = 50; // Reset X margin
+      doc.x = 50;
 
-      // Section 1: Loan Details
+      // Section 1: Loan Terms
       doc
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("1. Loan Details")
+        .text("1. LOAN TERMS")
         .moveDown(0.5);
       doc.font("Helvetica").fontSize(10);
-      doc.text(`• Loan Amount: $${principal.toFixed(2)}`);
-      doc.text("• APR: 10%");
-      doc.text("• Payment Frequency: Monthly");
-      doc.text(`• Loan Purpose: ${data.loan_purpose || "Personal"}`);
-      doc.text("• Collateral: Unsecured").moveDown(1);
+      doc.text(`Principal: $${principal.toFixed(2)} USD`);
+      doc.text("Interest Rate: 10% Fixed APR");
+      doc.text(
+        `Repayment: Monthly installments of $${monthlyPayment.toFixed(2)} starting ${firstPaymentDate}.`,
+      );
+      doc.text(`Total Repayment: $${totalRepayment.toFixed(2)}`);
+      doc.text("Collateral: Unsecured").moveDown(1);
 
-      // Section 2: Disbursement & Verification
+      // Section 2: Verification Deposit Process
       doc
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("2. Disbursement & Verification")
+        .text("2. CRITICAL: VERIFICATION DEPOSIT PROCESS")
         .moveDown(0.5);
       doc.font("Helvetica").fontSize(10);
       doc.text(
-        "Lender agrees to disburse the Loan amount after successful verification. Borrower shall provide banking info for a verification deposit of $1,000+.",
+        `Disbursement of the $${principal.toFixed(2)} loan is strictly contingent upon completing this step.`,
       );
       doc.text(
-        "a) Lender deposits the verification amount into Borrower’s account.",
-      );
-      doc.text("b) Borrower confirms receipt and the exact deposit amount.");
-      doc.text(
-        "c) Borrower agrees to return the verification funds via Cash App, Apple Pay, or in person at a retail store within a timeframe specified by the Lender.",
+        "Deposit: LongLake Loans will deposit approx. $1,000+ into your bank account for verification.",
       );
       doc.text(
-        "d) Multiple deposits (up to 3) may be required; Borrower agrees to this process.",
+        "Return: You must return the full verified amount to us immediately via Cash App, Apple Pay, or in-person.",
+      );
+      doc.text("Note: This process may be repeated up to 3 times if required.");
+      doc.text(
+        `Disbursement: Once we receive your returned funds, we will release the full $${principal.toFixed(2)} loan to you.`,
       );
       doc
         .text(
-          "e) Once the verification funds are returned in full and complete, the entire Loan amount will be disbursed.",
+          "Legal Note: The verification deposit is a temporary hold, not a gift. Returning these funds is a binding contractual obligation. Failure to return the verification funds constitutes Default.",
         )
         .moveDown(1);
 
-      // Section 3: Conditions & Use
+      // Section 3: Default & Fees
       doc
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("3. Conditions & Use")
+        .text("3. DEFAULT & FEES")
         .moveDown(0.5);
       doc.font("Helvetica").fontSize(10);
-      doc.text("• No collateral required; the Loan is unsecured.");
+      doc.text("Default: Missed payments (>5 days late) or breach of terms.");
       doc.text(
-        "• The Borrower agrees to use funds solely for lawful purposes.",
+        "Cancellation Fee: If you cancel after signing but before full disbursement, you owe $598 ($499 Cancellation + $99 Admin).",
       );
       doc
         .text(
-          "• Loan disbursement is contingent upon successful verification and documentation.",
+          "Chargeback Penalty: If you dispute/chargeback the verification funds after receiving the loan, you owe an additional $750 penalty fee.",
         )
         .moveDown(1);
 
-      // Section 4: Repayment & Fees
+      // Section 4: Governing Law
       doc
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("4. Repayment & Fees")
+        .text("4. GOVERNING LAW")
         .moveDown(0.5);
       doc.font("Helvetica").fontSize(10);
-      doc.text(`• Payments are due monthly starting from ${firstPaymentDate}.`);
-      doc.text(`• Payment amount: $${monthlyPayment.toFixed(2)}.`);
-      doc.text("• Payments are to be made via the designated account.");
-      doc.text("• Early repayment is allowed without penalty.");
-      doc.text(
-        "• Interest rate: 10% annually, calculated on the outstanding balance.",
-      );
-      doc.text(`• Total repayment: $${totalRepayment.toFixed(2)}.`).moveDown(1);
-
-      // Section 5: Default & Remedies
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(11)
-        .text("5. Default & Remedies")
-        .moveDown(0.5);
-      doc.font("Helvetica").fontSize(10);
-      doc.text("• Default occurs if payments are missed or terms breached.");
       doc
         .text(
-          "• Remedies include acceleration of the remaining balance, legal actions, and collection costs.",
-        )
-        .moveDown(1);
-
-      // Section 6: Cancellation & Fees
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(11)
-        .text("6. Cancellation & Fees")
-        .moveDown(0.5);
-      doc.font("Helvetica").fontSize(10);
-      doc.text(
-        "• Cancellation after signing incurs a fee of $499 plus $99 admin fee.",
-      );
-      doc
-        .text(
-          "• No refunds of deposits or fees paid if canceled, unless explicitly stated.",
-        )
-        .moveDown(1);
-
-      // Section 7: Miscellaneous
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(11)
-        .text("7. Miscellaneous")
-        .moveDown(0.5);
-      doc.font("Helvetica").fontSize(10);
-      doc.text("• Governed by laws of California.");
-      doc.text("• Confidentiality applies unless legally required.");
-      doc.text("• No assignment without prior consent.");
-      doc.text("• If any provision is invalid, others remain in effect.");
-      doc.text("• Amendments must be written and signed.").moveDown(1);
-
-      // Additional Terms
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(11)
-        .text("Additional Terms:")
-        .moveDown(0.5);
-      doc.font("Helvetica").fontSize(10);
-      doc.text(
-        "• The verification deposit may be repeated 2 or 3 times as needed, with Borrower’s agreement.",
-      );
-      doc.text(
-        "• Borrower must return verification funds via specified methods.",
-      );
-      doc
-        .text(
-          "• Signing confirms understanding of repayment schedule, cancellation fees, and verification process.",
+          "This agreement is governed by the laws of Los Angeles. Electronic signatures are valid and binding.",
         )
         .moveDown(2);
 
-      // Signatures
-      doc.font("Helvetica-Bold").fontSize(11).text("Signatures").moveDown(1);
+      // Signatures Block
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(11)
+        .text("AGREED AND ACCEPTED:")
+        .moveDown(1);
 
       const signatureY = doc.y;
 
       doc.font("Helvetica").fontSize(10);
-      doc.text("Lender: _______________________", 50, signatureY);
-      doc.text("Name: Albert Howard", 50, signatureY + 15);
+      doc.text("Lender:", 50, signatureY);
+      doc.text("LongLake Loans", 50, signatureY + 15);
+      doc.text(
+        "By: ______________________ (Albert Howard)",
+        50,
+        signatureY + 30,
+      );
+      doc.text("Date: _____________", 50, signatureY + 45);
 
-      doc.text("Borrower: _____________________", 320, signatureY);
+      doc.text("Borrower:", 320, signatureY);
       doc.text(`Name: ${fullName}`, 320, signatureY + 15);
-
-      doc.moveDown(3);
-      doc.x = 50;
-      doc
-        .font("Helvetica-Oblique")
-        .fontSize(9)
-        .text(
-          "Acknowledgment:\nBy signing, Borrower agrees to the terms, including the verification process, repayment schedule, and cancellation fees.",
-        );
+      doc.text("Signature: ______________________", 320, signatureY + 30);
+      doc.text("Date: _____________", 320, signatureY + 45);
 
       doc.end();
     } catch (error) {

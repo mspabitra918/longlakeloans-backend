@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS loan_applications (
         )
     ),                                                      -- loan.purpose                               
     loan_purpose_other_detail   VARCHAR(120),                                         -- loan.otherPurpose
-    loan_term                   INTEGER CHECK (loan_term IN (12, 24, 36, 48)),        -- not on the form; set on offer
+    loan_term                   INTEGER CHECK (loan_term IN (12, 24, 36, 48)),        -- loan.loanTerm
 
     -- ---- personal -----------------------------------------------------------
     first_name                  VARCHAR(40) NOT NULL,                                 -- personal.firstName
