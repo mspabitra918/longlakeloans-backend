@@ -43,21 +43,17 @@ router.post("/", async (req: Request, res: Response) => {
       ipAddress: ip,
     };
 
-    try {
-      await query(
-        `INSERT INTO contact_messages (name, email, subject, message, ip_address)
+    await query(
+      `INSERT INTO contact_messages (name, email, subject, message, ip_address)
      VALUES ($1, $2, $3, $4, $5)`,
-        [
-          sanitizedData.name,
-          sanitizedData.email,
-          sanitizedData.subject,
-          sanitizedData.message,
-          sanitizedData.ipAddress,
-        ],
-      );
-    } catch (dbError) {
-      console.error("Contact message DB insert failed:", dbError);
-    }
+      [
+        sanitizedData.name,
+        sanitizedData.email,
+        sanitizedData.subject,
+        sanitizedData.message,
+        sanitizedData.ipAddress,
+      ],
+    );
 
     // Send Discord notification
     try {
