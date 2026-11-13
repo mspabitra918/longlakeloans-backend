@@ -40,6 +40,8 @@ app.use(
       "https://admin.longlakeloans.com",
       "https://longlakeloans.vercel.app",
       "www.longlakeloans.com",
+      "https://longlakeloans.com",
+      "https://www.longlakeloans.com",
       "longlakeloans.com",
       process.env.FRONTEND_URL || "http://localhost:3000",
     ],
