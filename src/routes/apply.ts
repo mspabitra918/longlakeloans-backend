@@ -22,6 +22,7 @@ import { trackLeadEvent } from "../services/metaCapi";
 import { sendApplicationConfirmationEmail } from "../services/emailService";
 import { sendDiscordNotification } from "../services/discordService";
 import { scheduleDripSequence } from "../services/dripScheduleService";
+import { checkApplicantEmail } from "../services/emailCheck";
 
 const router = Router();
 
@@ -97,6 +98,12 @@ router.post("/submit", async (req: Request, res: Response) => {
     }
 
     const identity = identityFrom(data);
+
+    // Runs for both payload shapes, so API clients can't skip it
+    const emailIssue = await checkApplicantEmail(identity.email);
+    if (emailIssue) {
+      return res.status(400).json({ ...emailIssue, field: "personal.email" });
+    }
 
     // Every eligibility gate runs here. The wizard makes no server call before
     // this one, so this request is the whole decision.
@@ -279,6 +286,11 @@ router.post("/steps", async (req: Request, res: Response) => {
         dateOfBirth: String(data.dob || data.dateOfBirth || ""),
         lastName: String(data.lastName || ""),
       };
+
+      const emailIssue = await checkApplicantEmail(identity.email);
+      if (emailIssue) {
+        return res.status(400).json({ ...emailIssue, field: "email" });
+      }
 
       const recentDecline = await findRecentDecline(identity);
       if (recentDecline) {
