@@ -37,7 +37,7 @@ app.use((_req, res, next) => {
 app.use(
   cors({
     origin: [
-      "https://longlakeloans-admin-fe.vercel.app",
+      "https://admin.longlakeloans.com",
       "https://longlakeloans.vercel.app",
       "www.longlakeloans.com",
       "longlakeloans.com",
